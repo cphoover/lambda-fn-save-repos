@@ -40,7 +40,6 @@
   "license": "UNLICENSED",
   "eslintConfig": {},
   "dependencies": {
-    "aws-sdk": "^2.2.47",
     "bluebird": "^3.3.4",
     "browserify": "^13.0.0",
     "elasticsearch": "^10.1.3",
