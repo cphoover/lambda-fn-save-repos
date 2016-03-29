@@ -26,10 +26,6 @@ var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _awsSdk = require('aws-sdk');
-
-var _awsSdk2 = _interopRequireDefault(_awsSdk);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -39,6 +35,7 @@ var logger = (0, _logger2.default)('lambda-fn-save-repos');
 var RepoSaver = function () {
 	function RepoSaver() {
 		var settings = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+		var AWS = arguments[1];
 
 		_classCallCheck(this, RepoSaver);
 
@@ -59,7 +56,7 @@ var RepoSaver = function () {
 		if (this.signRequest) {
 			this._validateRequired(this, 'awsRegion', _lodash2.default.isString);
 			if (this.useEnvCreds) {
-				this.myCredentials = new _awsSdk2.default.EnvironmentCredentials('AWS');
+				this.myCredentials = new AWS.EnvironmentCredentials('AWS');
 			} else {
 				this._validateRequired(this, 'accessKey', _lodash2.default.isString);
 				this._validateRequired(this, 'secretKey', _lodash2.default.isString);
