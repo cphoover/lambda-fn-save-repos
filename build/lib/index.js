@@ -121,12 +121,12 @@ var RepoSaver = function () {
 	}, {
 		key: '_validateOptional',
 		value: function _validateOptional(_repo, field, validator) {
-			(0, _assert2.default)(!_repo[field] || validator(_repo[field]), 'optional field ' + _repo[field] + ' must be valid');
+			(0, _assert2.default)(!_repo[field] || validator(_repo[field]), 'optional field ' + field + ' must be valid');
 		}
 	}, {
 		key: '_validateRequired',
 		value: function _validateRequired(_repo, field, validator) {
-			(0, _assert2.default)(validator(_repo[field]), 'required field ' + _repo[field] + ' must be valid');
+			(0, _assert2.default)(validator(_repo[field]), 'required field ' + field + ' must be valid');
 		}
 	}, {
 		key: 'run',
