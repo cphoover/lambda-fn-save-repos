@@ -1,0 +1,12 @@
+{
+	"repo_saver" : {
+		"aws_elasticsearch" : {
+			"use_env_creds" : true,
+			"signed" : true,
+			"host" : "change this to a valid host",
+			"region" : "us-east-1",
+			"index" : "github",
+			"type" : "repo"
+		}
+	}
+}
