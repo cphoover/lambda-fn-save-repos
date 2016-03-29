@@ -1,11 +1,8 @@
-import uglify from 'gulp-uglify';
-import rename from 'gulp-rename';
-import sourcemaps from 'gulp-sourcemaps';
 import runSequence from 'run-sequence';
 
 import clean from 'gulp-clean';
 import gulp from 'gulp';
-import source from 'vinyl-source-stream';
+// import source from 'vinyl-source-stream';
 import gulpif from 'gulp-if';
 import babel from 'gulp-babel';
 import istanbul from 'gulp-babel-istanbul';
@@ -13,8 +10,7 @@ import lintspaces from 'gulp-lintspaces';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
 import _ from 'lodash';
-import browserify from 'browserify';
-import babelify from 'babelify';
+// import browserify from 'browserify';
 import taskListing from 'gulp-task-listing';
 
 import lintspacesrc from 'linting/lintspaces';
@@ -31,43 +27,6 @@ gulp.task('clean', function () {
 		.pipe(clean());
 });
 
-
-function handleError(err, msg) {
-	console.error(`Uh Oh Looks like something went wrong:\n ${msg || ''}`);
-	throw err;
-}
-
-gulp.task('bundle', ['clean'], function bundleVendorRun() {
-	const bundler = browserify().transform(babelify.configure({
-		presets: ['es2015']
-	}));
-
-	bundler.require('./lib');
-
-	return bundler.bundle()
-		.on('error', err => handleError('issue while bundling shared libs!!!', err))
-		.pipe(source('index.js'))
-		.pipe(gulp.dest(buildDir));
-});
-
-gulp.task('build', ['test'], function (cb) {
-	runSequence('clean', 'minify', cb);
-});
-
-gulp.task('minify', ['bundle'], function minifyJavascript() {
-	return gulp.src(['./build/**/*.js'])
-			.pipe(rename({
-				extname: '.min.js'
-			}))
-			.pipe(sourcemaps.init({
-				loadMaps: true
-			}))
-			.pipe(uglify())
-			.pipe(sourcemaps.write('./'))
-			.pipe(gulp.dest(path.join(buildDir)));
-});
-
-
 const config = {
 	coverage: {
 		statements: 80,
@@ -79,10 +38,6 @@ const config = {
 		eslint: [
 			'*.js',
 			topLevelDirs + '/**/*.js'
-		],
-		eslintJSX: [
-			'*.jsx',
-			topLevelDirs + '/**/*.jsx'
 		],
 		js: [
 			'*.js',
@@ -103,6 +58,20 @@ const config = {
 		]
 	}
 };
+
+gulp.task('babel', ['clean'], function taskl() {
+	const globStr = path.join(topLevelDirs, '**', '*');
+	gulp.src(globStr)
+		.pipe(gulpif(/\.js$/, babel({
+			presets: ['es2015']
+		})))
+		.pipe(gulp.dest(buildDir));
+});
+
+gulp.task('build', ['test'], function (cb) {
+	runSequence('clean', 'babel', cb);
+});
+
 
 function onError(e) {
 	throw e;
@@ -155,14 +124,6 @@ gulp.task('lint:js', function lintJS() {
 		.on('error', onError);
 });
 
-gulp.task('lint:jsx', function lintJS() {
-	return gulp.src(config.paths.eslintJSX)
-		.pipe(eslint(eslintConfigFile))
-		.pipe(eslint.format())
-		.pipe(eslint.failAfterError())
-		.on('error', onError);
-});
-
 gulp.task('mocha', function mochaRun(cb) {
 	gulp.src(config.paths.js)
 		.pipe(istanbul())
@@ -179,7 +140,7 @@ gulp.task('mocha', function mochaRun(cb) {
 });
 
 
-gulp.task('lint', ['lint:whitespace', 'lint:package', 'lint:js', 'lint:jsx']);
+gulp.task('lint', ['lint:whitespace', 'lint:package', 'lint:js']);
 gulp.task('test', ['lint', 'mocha']);
 gulp.task('default', ['test']);
 

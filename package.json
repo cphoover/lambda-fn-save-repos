@@ -2,7 +2,7 @@
   "name": "lambda-fn-save-repos",
   "version": "0.1.0",
   "description": "lambda-fn-save-repos",
-  "main": "./build/index.min.js",
+  "main": "./build/lib/index.js",
   "devDependencies": {
     "babel-core": "^6.3.21",
     "babel-loader": "^6.2.4",
@@ -44,6 +44,7 @@
     "bluebird": "^3.3.4",
     "browserify": "^13.0.0",
     "elasticsearch": "^10.1.3",
+    "gulp-babel": "^6.1.2",
     "gulp-if": "^2.0.0",
     "gulp-less": "^3.0.5",
     "http-aws-es": "^1.1.3",
