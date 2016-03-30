@@ -146,7 +146,7 @@ var RepoSaver = function () {
 
 					if (_this2.useEnvCreds) {
 						logger.info('using environment creds');
-						clientConfig.amazonES.credentials = _this2.myCrednentials;
+						clientConfig.amazonES.credentials = _this2.myCredentials;
 					} else {
 						clientConfig.amazonES.accessKey = _this2.accessKey;
 						clientConfig.amazonES.secretKey = _this2.secretKey;
