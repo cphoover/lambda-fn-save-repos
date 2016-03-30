@@ -281,7 +281,7 @@ describe('RepoSaver', function suite() {
 		});
 
 		var repoSaver = new _3.default(settings);
-		return repoSaver.run({ repos: inputRepos }).then(function () {
+		return repoSaver.run(inputRepos).then(function () {
 			// console.log('store', JSON.stringify(store, null, 4));
 			_assert2.default.deepEqual(creds, {
 				'region': 'us-east-1',
@@ -308,7 +308,7 @@ describe('RepoSaver', function suite() {
 		});
 
 		var repoSaver = new _3.default(_settings);
-		return repoSaver.run({ repos: inputRepos }).then(function () {
+		return repoSaver.run(inputRepos).then(function () {
 			_assert2.default.deepEqual(config, {
 				'hosts': 'localhost:9200'
 			});

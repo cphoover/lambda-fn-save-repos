@@ -126,7 +126,7 @@ var RepoSaver = function () {
 		}
 	}, {
 		key: 'run',
-		value: function run(event) {
+		value: function run(repos) {
 			var _this2 = this;
 
 			var clientConfig = {
@@ -144,11 +144,9 @@ var RepoSaver = function () {
 
 			var client = _elasticsearch2.default.Client(clientConfig); // eslint-disable-line new-cap
 
-			if (!_lodash2.default.isArray(event.repos)) {
+			if (!_lodash2.default.isArray(repos)) {
 				throw new TypeError('Endpoint was expecting an array');
 			}
-
-			var repos = event.repos;
 
 			repos.forEach(function (x) {
 				return _this2._validate(x);

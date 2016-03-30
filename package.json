@@ -1,6 +1,6 @@
 {
   "name": "lambda-fn-save-repos",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "lambda-fn-save-repos",
   "main": "./build/lib/index.js",
   "devDependencies": {
