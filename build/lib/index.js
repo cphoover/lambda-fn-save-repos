@@ -145,6 +145,7 @@ var RepoSaver = function () {
 					};
 
 					if (_this2.useEnvCreds) {
+						logger.info('using environment creds');
 						clientConfig.amazonES.credentials = _this2.myCrednentials;
 					} else {
 						clientConfig.amazonES.accessKey = _this2.accessKey;
