@@ -109,7 +109,7 @@ var RepoSaver = function () {
 	}, {
 		key: '_validate',
 		value: function _validate(repo) {
-			this._validateOptional(repo, 'id', _lodash2.default.isInteger);
+			this._validateRequired(repo, 'id', _lodash2.default.isInteger);
 			this._validateRequired(repo, 'name', _lodash2.default.isString);
 			this._validateOptional(repo, 'description', _lodash2.default.isString);
 			this._validateOptional(repo, 'pushed_at', _lodash2.default.isString);
