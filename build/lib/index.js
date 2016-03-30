@@ -18,10 +18,6 @@ var _elasticsearch = require('elasticsearch');
 
 var _elasticsearch2 = _interopRequireDefault(_elasticsearch);
 
-var _httpAwsEs = require('http-aws-es');
-
-var _httpAwsEs2 = _interopRequireDefault(_httpAwsEs);
-
 var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
@@ -32,6 +28,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var logger = (0, _logger2.default)('lambda-fn-save-repos');
 
+var httpAwsEsBuilder = require('http-aws-es-di/connector');
+
 var RepoSaver = function () {
 	function RepoSaver() {
 		var settings = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -39,6 +37,7 @@ var RepoSaver = function () {
 
 		_classCallCheck(this, RepoSaver);
 
+		this.AWS = AWS;
 		if (!_lodash2.default.isObject(settings.aws_elasticsearch)) {
 			throw new Error('must provide aws_elasticsearch configuration');
 		}
@@ -56,7 +55,7 @@ var RepoSaver = function () {
 		if (this.signRequest) {
 			this._validateRequired(this, 'awsRegion', _lodash2.default.isString);
 			if (this.useEnvCreds) {
-				this.myCredentials = new AWS.EnvironmentCredentials('AWS');
+				this.myCredentials = new this.AWS.EnvironmentCredentials('AWS');
 			} else {
 				this._validateRequired(this, 'accessKey', _lodash2.default.isString);
 				this._validateRequired(this, 'secretKey', _lodash2.default.isString);
@@ -135,7 +134,7 @@ var RepoSaver = function () {
 			};
 
 			if (this.signRequest) {
-				clientConfig.connectionClass = _httpAwsEs2.default;
+				clientConfig.connectionClass = httpAwsEsBuilder(this.AWS);
 				clientConfig.amazonES = {
 					region: this.awsRegion,
 					accessKey: this.accessKey,
