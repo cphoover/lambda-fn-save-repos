@@ -141,10 +141,15 @@ var RepoSaver = function () {
 				if (_this2.signRequest) {
 					clientConfig.connectionClass = httpAwsEsBuilder(_this2.AWS);
 					clientConfig.amazonES = {
-						region: _this2.awsRegion,
-						accessKey: _this2.accessKey,
-						secretKey: _this2.secretKey
+						region: _this2.awsRegion
 					};
+
+					if (_this2.useEnvCreds) {
+						clientConfig.amazonES.credentials = _this2.myCrednentials;
+					} else {
+						clientConfig.amazonES.accessKey = _this2.accessKey;
+						clientConfig.amazonES.secretKey = _this2.secretKey;
+					}
 				}
 
 				var client = _elasticsearch2.default.Client(clientConfig); // eslint-disable-line new-cap
