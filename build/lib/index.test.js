@@ -273,8 +273,8 @@ describe('RepoSaver', function suite() {
 		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(config) {
 			creds = config.amazonES;
 			return {
-				bulk: function bulk(actions) {
-					store.push(actions);
+				bulk: function bulk(payload) {
+					store.push(payload.body);
 					return _bluebird2.default.resolve();
 				}
 			};
@@ -300,8 +300,8 @@ describe('RepoSaver', function suite() {
 		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(_config) {
 			config = _config;
 			return {
-				bulk: function bulk(actions) {
-					store.push(actions);
+				bulk: function bulk(payload) {
+					store.push(payload.body);
 					return _bluebird2.default.resolve();
 				}
 			};

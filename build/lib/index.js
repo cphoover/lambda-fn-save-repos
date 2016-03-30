@@ -109,7 +109,7 @@ var RepoSaver = function () {
 	}, {
 		key: '_validate',
 		value: function _validate(repo) {
-			this._validateOptional(repo, 'id', _lodash2.default.isInteger);
+			this._validateRequired(repo, 'id', _lodash2.default.isInteger);
 			this._validateRequired(repo, 'name', _lodash2.default.isString);
 			this._validateOptional(repo, 'description', _lodash2.default.isString);
 			this._validateOptional(repo, 'pushed_at', _lodash2.default.isString);
@@ -145,7 +145,8 @@ var RepoSaver = function () {
 					};
 
 					if (_this2.useEnvCreds) {
-						clientConfig.amazonES.credentials = _this2.myCrednentials;
+						logger.info('using environment creds');
+						clientConfig.amazonES.credentials = _this2.myCredentials;
 					} else {
 						clientConfig.amazonES.accessKey = _this2.accessKey;
 						clientConfig.amazonES.secretKey = _this2.secretKey;
@@ -162,7 +163,7 @@ var RepoSaver = function () {
 					return _this2._validate(x);
 				});
 				logger.info('saving repos');
-				return client.bulk(_this2._generateBulkArray(repos));
+				return client.bulk({ body: _this2._generateBulkArray(repos) });
 			});
 		}
 	}]);
