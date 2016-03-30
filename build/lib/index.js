@@ -22,6 +22,10 @@ var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -129,30 +133,32 @@ var RepoSaver = function () {
 		value: function run(repos) {
 			var _this2 = this;
 
-			var clientConfig = {
-				hosts: this.esHost
-			};
-
-			if (this.signRequest) {
-				clientConfig.connectionClass = httpAwsEsBuilder(this.AWS);
-				clientConfig.amazonES = {
-					region: this.awsRegion,
-					accessKey: this.accessKey,
-					secretKey: this.secretKey
+			return _bluebird2.default.try(function () {
+				var clientConfig = {
+					hosts: _this2.esHost
 				};
-			}
 
-			var client = _elasticsearch2.default.Client(clientConfig); // eslint-disable-line new-cap
+				if (_this2.signRequest) {
+					clientConfig.connectionClass = httpAwsEsBuilder(_this2.AWS);
+					clientConfig.amazonES = {
+						region: _this2.awsRegion,
+						accessKey: _this2.accessKey,
+						secretKey: _this2.secretKey
+					};
+				}
 
-			if (!_lodash2.default.isArray(repos)) {
-				throw new TypeError('Endpoint was expecting an array');
-			}
+				var client = _elasticsearch2.default.Client(clientConfig); // eslint-disable-line new-cap
 
-			repos.forEach(function (x) {
-				return _this2._validate(x);
+				if (!_lodash2.default.isArray(repos)) {
+					throw new TypeError('Endpoint was expecting an array');
+				}
+
+				repos.forEach(function (x) {
+					return _this2._validate(x);
+				});
+				logger.info('saving repos');
+				return client.bulk(_this2._generateBulkArray(repos));
 			});
-			logger.info('saving repos');
-			return client.bulk(this._generateBulkArray(repos));
 		}
 	}]);
 
