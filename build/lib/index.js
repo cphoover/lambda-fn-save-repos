@@ -163,7 +163,7 @@ var RepoSaver = function () {
 					return _this2._validate(x);
 				});
 				logger.info('saving repos');
-				return client.bulk(_this2._generateBulkArray(repos));
+				return client.bulk({ body: _this2._generateBulkArray(repos) });
 			});
 		}
 	}]);
