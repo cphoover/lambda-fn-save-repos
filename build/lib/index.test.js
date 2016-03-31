@@ -16,6 +16,10 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _awsSdk = require('aws-sdk');
+
+var _awsSdk2 = _interopRequireDefault(_awsSdk);
+
 var _elasticsearch = require('elasticsearch');
 
 var _elasticsearch2 = _interopRequireDefault(_elasticsearch);
@@ -37,8 +41,8 @@ describe('RepoSaver', function suite() {
 	});
 
 	var settings = {
-		'aws_elasticsearch': {
-			'signed': true,
+		'elasticsearch': {
+			'signed': false,
 			'host': 'localhost:9200',
 			'region': 'us-east-1',
 			'access_key': 'xxxx_access',
@@ -268,6 +272,8 @@ describe('RepoSaver', function suite() {
 	});
 
 	it('saveRep will call client.bulk with correct payload', function test() {
+		var tSettings = _lodash2.default.clone(settings);
+		tSettings.elasticsearch.signed = true;
 		var store = [];
 		var creds = void 0;
 		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(config) {
@@ -280,21 +286,23 @@ describe('RepoSaver', function suite() {
 			};
 		});
 
-		var repoSaver = new _3.default(settings);
+		var repoSaver = new _3.default(tSettings, _awsSdk2.default);
 		return repoSaver.run(inputRepos).then(function () {
 			// console.log('store', JSON.stringify(store, null, 4));
+			console.log('creds*******', JSON.stringify(creds, null, 4));
 			_assert2.default.deepEqual(creds, {
 				'region': 'us-east-1',
 				'accessKey': 'xxxx_access',
 				'secretKey': 'xxx_secret'
 			});
+			console.log('store[0] ++++++++', JSON.stringify(store[0], null, 4));
 			_assert2.default.deepEqual(store[0], expectedActions);
 		});
 	});
 
 	it('will pass in correct config when signed is false', function test() {
 		var _settings = _lodash2.default.clone(settings);
-		_settings.aws_elasticsearch.signed = false;
+		_settings.elasticsearch.signed = false;
 		var store = [];
 		var config = void 0;
 		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(_config) {
