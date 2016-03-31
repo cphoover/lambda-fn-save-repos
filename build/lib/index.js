@@ -14,25 +14,23 @@ var _assert = require('assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
-var _elasticsearch = require('elasticsearch');
+var _simpleValidator = require('simple-validator');
 
-var _elasticsearch2 = _interopRequireDefault(_elasticsearch);
+var _simpleValidator2 = _interopRequireDefault(_simpleValidator);
 
 var _logger = require('./logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _bluebird = require('bluebird');
+var _awsElasticsearchMixin = require('aws-elasticsearch-mixin');
 
-var _bluebird2 = _interopRequireDefault(_bluebird);
+var _awsElasticsearchMixin2 = _interopRequireDefault(_awsElasticsearchMixin);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var logger = (0, _logger2.default)('lambda-fn-save-repos');
-
-var httpAwsEsBuilder = require('http-aws-es-di/connector');
 
 var RepoSaver = function () {
 	function RepoSaver() {
@@ -41,32 +39,11 @@ var RepoSaver = function () {
 
 		_classCallCheck(this, RepoSaver);
 
-		this.AWS = AWS;
-		if (!_lodash2.default.isObject(settings.aws_elasticsearch)) {
-			throw new Error('must provide aws_elasticsearch configuration');
-		}
-
-		this.esHost = settings.aws_elasticsearch.host;
-		this.awsRegion = settings.aws_elasticsearch.region;
-		this.accessKey = settings.aws_elasticsearch.access_key;
-		this.secretKey = settings.aws_elasticsearch.secret_key;
-		this.esIndex = settings.aws_elasticsearch.index;
-		this.esType = settings.aws_elasticsearch.type;
-		this.signRequest = !!settings.aws_elasticsearch.signed;
-		this.useEnvCreds = !!settings.aws_elasticsearch.use_env_creds;
-
-		this._validateRequired(this, 'esHost', _lodash2.default.isString);
-		if (this.signRequest) {
-			this._validateRequired(this, 'awsRegion', _lodash2.default.isString);
-			if (this.useEnvCreds) {
-				this.myCredentials = new this.AWS.EnvironmentCredentials('AWS');
-			} else {
-				this._validateRequired(this, 'accessKey', _lodash2.default.isString);
-				this._validateRequired(this, 'secretKey', _lodash2.default.isString);
-			}
-		}
-		this._validateRequired(this, 'esIndex', _lodash2.default.isString);
-		this._validateRequired(this, 'esType', _lodash2.default.isString);
+		(0, _awsElasticsearchMixin2.default)(this, settings.elasticsearch, AWS);
+		this.esIndex = settings.elasticsearch.index;
+		this.esType = settings.elasticsearch.type;
+		_simpleValidator2.default.required(this, 'esIndex', _lodash2.default.isString);
+		_simpleValidator2.default.required(this, 'esType', _lodash2.default.isString);
 	}
 
 	_createClass(RepoSaver, [{
@@ -109,14 +86,14 @@ var RepoSaver = function () {
 	}, {
 		key: '_validate',
 		value: function _validate(repo) {
-			this._validateRequired(repo, 'id', _lodash2.default.isInteger);
-			this._validateRequired(repo, 'name', _lodash2.default.isString);
-			this._validateOptional(repo, 'description', _lodash2.default.isString);
-			this._validateOptional(repo, 'pushed_at', _lodash2.default.isString);
-			this._validateRequired(repo, 'git_url', _lodash2.default.isString);
-			this._validateOptional(repo, 'stargazers_count', _lodash2.default.isInteger);
-			this._validateOptional(repo, 'forks_count', _lodash2.default.isInteger);
-			this._validateOptional(repo, 'open_issues_count', _lodash2.default.isInteger);
+			_simpleValidator2.default.required(repo, 'id', _lodash2.default.isInteger);
+			_simpleValidator2.default.required(repo, 'name', _lodash2.default.isString);
+			_simpleValidator2.default.optional(repo, 'description', _lodash2.default.isString);
+			_simpleValidator2.default.optional(repo, 'pushed_at', _lodash2.default.isString);
+			_simpleValidator2.default.required(repo, 'git_url', _lodash2.default.isString);
+			_simpleValidator2.default.optional(repo, 'stargazers_count', _lodash2.default.isInteger);
+			_simpleValidator2.default.optional(repo, 'forks_count', _lodash2.default.isInteger);
+			_simpleValidator2.default.optional(repo, 'open_issues_count', _lodash2.default.isInteger);
 		}
 	}, {
 		key: '_validateOptional',
@@ -133,28 +110,7 @@ var RepoSaver = function () {
 		value: function run(repos) {
 			var _this2 = this;
 
-			return _bluebird2.default.try(function () {
-				var clientConfig = {
-					hosts: _this2.esHost
-				};
-
-				if (_this2.signRequest) {
-					clientConfig.connectionClass = httpAwsEsBuilder(_this2.AWS);
-					clientConfig.amazonES = {
-						region: _this2.awsRegion
-					};
-
-					if (_this2.useEnvCreds) {
-						logger.info('using environment creds');
-						clientConfig.amazonES.credentials = _this2.myCredentials;
-					} else {
-						clientConfig.amazonES.accessKey = _this2.accessKey;
-						clientConfig.amazonES.secretKey = _this2.secretKey;
-					}
-				}
-
-				var client = _elasticsearch2.default.Client(clientConfig); // eslint-disable-line new-cap
-
+			return this.getESClient().then(function (client) {
 				if (!_lodash2.default.isArray(repos)) {
 					throw new TypeError('Endpoint was expecting an array');
 				}
