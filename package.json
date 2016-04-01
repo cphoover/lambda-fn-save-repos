@@ -47,7 +47,6 @@
   "dependencies": {
     "aws-elasticsearch-mixin": "git+ssh://git@github.com/cphoover/aws-elasticsearch-mixin.git",
     "bluebird": "^3.3.4",
-    "elasticsearch": "^10.1.3",
     "http-aws-es-di": "^1.1.6",
     "lodash": "^4.6.1",
     "nconf": "^0.8.4",

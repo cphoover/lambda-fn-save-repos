@@ -112,7 +112,8 @@ var RepoSaver = function () {
 
 			return this.getESClient().then(function (client) {
 				if (!_lodash2.default.isArray(repos)) {
-					throw new TypeError('Endpoint was expecting an array');
+					console.log('throwing new ValidationError');
+					throw new _simpleValidator2.default.ValidationError('Endpoint was expecting an array');
 				}
 
 				repos.forEach(function (x) {
