@@ -288,14 +288,11 @@ describe('RepoSaver', function suite() {
 
 		var repoSaver = new _3.default(tSettings, _awsSdk2.default);
 		return repoSaver.run(inputRepos).then(function () {
-			// console.log('store', JSON.stringify(store, null, 4));
-			console.log('creds*******', JSON.stringify(creds, null, 4));
 			_assert2.default.deepEqual(creds, {
 				'region': 'us-east-1',
 				'accessKey': 'xxxx_access',
 				'secretKey': 'xxx_secret'
 			});
-			console.log('store[0] ++++++++', JSON.stringify(store[0], null, 4));
 			_assert2.default.deepEqual(store[0], expectedActions);
 		});
 	});
