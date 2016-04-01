@@ -20,13 +20,13 @@ var _awsSdk = require('aws-sdk');
 
 var _awsSdk2 = _interopRequireDefault(_awsSdk);
 
-var _elasticsearch = require('elasticsearch');
-
-var _elasticsearch2 = _interopRequireDefault(_elasticsearch);
-
 var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var _simpleValidator = require('simple-validator');
+
+var _simpleValidator2 = _interopRequireDefault(_simpleValidator);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -275,49 +275,25 @@ describe('RepoSaver', function suite() {
 		var tSettings = _lodash2.default.clone(settings);
 		tSettings.elasticsearch.signed = true;
 		var store = [];
-		var creds = void 0;
-		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(config) {
-			creds = config.amazonES;
-			return {
+		var repoSaver = new _3.default(tSettings, _awsSdk2.default);
+		this.sandbox.stub(repoSaver, 'getESClient', function stub(config) {
+			return _bluebird2.default.resolve({
 				bulk: function bulk(payload) {
 					store.push(payload.body);
 					return _bluebird2.default.resolve();
 				}
-			};
+			});
 		});
 
-		var repoSaver = new _3.default(tSettings, _awsSdk2.default);
 		return repoSaver.run(inputRepos).then(function () {
-			_assert2.default.deepEqual(creds, {
-				'region': 'us-east-1',
-				'accessKey': 'xxxx_access',
-				'secretKey': 'xxx_secret'
-			});
 			_assert2.default.deepEqual(store[0], expectedActions);
 		});
 	});
 
-	it('will pass in correct config when signed is false', function test() {
-		var _settings = _lodash2.default.clone(settings);
-		_settings.elasticsearch.signed = false;
-		var store = [];
-		var config = void 0;
-		this.sandbox.stub(_elasticsearch2.default, 'Client', function stub(_config) {
-			config = _config;
-			return {
-				bulk: function bulk(payload) {
-					store.push(payload.body);
-					return _bluebird2.default.resolve();
-				}
-			};
-		});
-
-		var repoSaver = new _3.default(_settings);
-		return repoSaver.run(inputRepos).then(function () {
-			_assert2.default.deepEqual(config, {
-				'hosts': 'localhost:9200'
-			});
-			_assert2.default.deepEqual(store[0], expectedActions);
+	it('will return a rejected promise if not passed an array', function test(done) {
+		var repoSaver = new _3.default(settings, _awsSdk2.default);
+		repoSaver.run('asdf').catch(_simpleValidator2.default.ValidationError, function () {
+			return done();
 		});
 	});
 });
